@@ -1,0 +1,958 @@
+--============================================================
+-- DQ UNIVERSAL VFX COLOR
+-- MOBILE + PC | STABLE MENU | LOW LAG
+-- LOADING SCREEN + SOUND
+--============================================================
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+local Lighting = game:GetService("Lighting")
+local TweenService = game:GetService("TweenService")
+
+local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
+
+--============================================================
+-- CLEAN OLD
+--============================================================
+
+for _,v in ipairs(PlayerGui:GetChildren()) do
+	if v.Name == "DQ_VFX_FINAL" then
+		pcall(function()
+			v:Destroy()
+		end)
+	end
+end
+
+--============================================================
+-- SETTINGS
+--============================================================
+
+local Enabled = true
+local Neon = true
+local MixColor = false
+local Shader = true
+local Shadow = true
+
+local SelectedColor = Color3.fromRGB(255,191,0)
+local SelectedName = "Hổ Phách"
+
+local MAX_PER_FRAME = 12
+
+--============================================================
+-- GUI
+--============================================================
+
+local Gui = Instance.new("ScreenGui")
+Gui.Name = "DQ_VFX_FINAL"
+Gui.ResetOnSpawn = false
+Gui.IgnoreGuiInset = true
+Gui.DisplayOrder = 100000
+Gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+Gui.Parent = PlayerGui
+
+--============================================================
+-- LOADING SCREEN
+--============================================================
+
+local Loading = Instance.new("Frame")
+Loading.Name = "DQ_LOADING"
+Loading.Size = UDim2.fromScale(1,1)
+Loading.BackgroundColor3 = Color3.fromRGB(8,8,12)
+Loading.BorderSizePixel = 0
+Loading.ZIndex = 9000
+Loading.Parent = Gui
+
+local LoadBox = Instance.new("Frame")
+LoadBox.Size = UDim2.fromOffset(240,140)
+LoadBox.AnchorPoint = Vector2.new(.5,.5)
+LoadBox.Position = UDim2.fromScale(.5,.45)
+LoadBox.BackgroundColor3 = Color3.fromRGB(16,16,20)
+LoadBox.BorderSizePixel = 0
+LoadBox.ZIndex = 9001
+LoadBox.Parent = Loading
+
+local LoadCorner = Instance.new("UICorner")
+LoadCorner.CornerRadius = UDim.new(0,10)
+LoadCorner.Parent = LoadBox
+
+local LoadStroke = Instance.new("UIStroke")
+LoadStroke.Color = Color3.fromRGB(255,0,0)
+LoadStroke.Thickness = 3
+LoadStroke.Parent = LoadBox
+
+local Logo = Instance.new("TextLabel")
+Logo.Size = UDim2.new(1,0,0,60)
+Logo.Position = UDim2.fromOffset(0,8)
+Logo.BackgroundTransparency = 1
+Logo.Text = "DQ"
+Logo.Font = Enum.Font.Arcade
+Logo.TextScaled = true
+Logo.TextColor3 = Color3.new(1,1,1)
+Logo.TextStrokeColor3 = Color3.fromRGB(255,0,0)
+Logo.TextStrokeTransparency = .2
+Logo.ZIndex = 9002
+Logo.Parent = LoadBox
+
+local LoadingText = Instance.new("TextLabel")
+LoadingText.Size = UDim2.new(1,-20,0,30)
+LoadingText.Position = UDim2.fromOffset(10,72)
+LoadingText.BackgroundTransparency = 1
+LoadingText.Text = "LOADING..."
+LoadingText.Font = Enum.Font.Code
+LoadingText.TextSize = 16
+LoadingText.TextColor3 = Color3.fromRGB(235,235,235)
+LoadingText.ZIndex = 9002
+LoadingText.Parent = LoadBox
+
+local LoadingSound = Instance.new("Sound")
+LoadingSound.Name = "DQ_LoadingSound"
+LoadingSound.SoundId = "rbxassetid://76897866662431"
+LoadingSound.Volume = .35
+LoadingSound.Looped = true
+LoadingSound.Parent = Loading
+
+pcall(function()
+	LoadingSound:Play()
+end)
+
+--============================================================
+-- ICON
+--============================================================
+
+local Icon = Instance.new("TextButton")
+Icon.Name = "DQ_ICON"
+Icon.Size = UDim2.fromOffset(60,60)
+Icon.Position = UDim2.fromOffset(20,200)
+Icon.BackgroundColor3 = Color3.fromRGB(8,8,10)
+Icon.BorderSizePixel = 0
+Icon.Text = "DQ"
+Icon.TextColor3 = Color3.new(1,1,1)
+Icon.Font = Enum.Font.GothamBlack
+Icon.TextSize = 19
+Icon.AutoButtonColor = false
+Icon.Active = true
+Icon.Visible = false
+Icon.ZIndex = 10000
+Icon.Parent = Gui
+
+local IconCorner = Instance.new("UICorner")
+IconCorner.CornerRadius = UDim.new(1,0)
+IconCorner.Parent = Icon
+
+local IconStroke = Instance.new("UIStroke")
+IconStroke.Color = Color3.fromRGB(255,0,0)
+IconStroke.Thickness = 3
+IconStroke.Parent = Icon
+
+--============================================================
+-- MENU
+--============================================================
+
+local Menu = Instance.new("Frame")
+Menu.Name = "DQ_MENU"
+Menu.Size = UDim2.fromOffset(310,445)
+Menu.BackgroundColor3 = Color3.fromRGB(9,9,13)
+Menu.BorderSizePixel = 0
+Menu.Visible = false
+Menu.Active = true
+Menu.ZIndex = 8000
+Menu.Parent = Gui
+
+local MenuCorner = Instance.new("UICorner")
+MenuCorner.CornerRadius = UDim.new(0,14)
+MenuCorner.Parent = Menu
+
+local MenuStroke = Instance.new("UIStroke")
+MenuStroke.Color = Color3.fromRGB(255,0,0)
+MenuStroke.Thickness = 2
+MenuStroke.Parent = Menu
+
+--============================================================
+-- HEADER
+--============================================================
+
+local Header = Instance.new("TextLabel")
+Header.Size = UDim2.new(1,-20,0,35)
+Header.Position = UDim2.fromOffset(10,6)
+Header.BackgroundTransparency = 1
+Header.Text = "DQ  •  VFX COLOR"
+Header.TextColor3 = Color3.new(1,1,1)
+Header.Font = Enum.Font.GothamBold
+Header.TextSize = 16
+Header.TextXAlignment = Enum.TextXAlignment.Left
+Header.ZIndex = 8001
+Header.Parent = Menu
+
+local Current = Instance.new("TextLabel")
+Current.Size = UDim2.new(1,-20,0,34)
+Current.Position = UDim2.fromOffset(10,43)
+Current.BackgroundColor3 = SelectedColor
+Current.Text = "Hổ Phách • #FFBF00"
+Current.TextColor3 = Color3.new(1,1,1)
+Current.Font = Enum.Font.GothamBold
+Current.TextSize = 12
+Current.BorderSizePixel = 0
+Current.ZIndex = 8001
+Current.Parent = Menu
+
+local CurrentCorner = Instance.new("UICorner")
+CurrentCorner.CornerRadius = UDim.new(0,8)
+CurrentCorner.Parent = Current
+
+--============================================================
+-- BUTTON FACTORY
+--============================================================
+
+local function MakeButton(text,y)
+
+	local B = Instance.new("TextButton")
+
+	B.Size = UDim2.new(1,-20,0,32)
+	B.Position = UDim2.fromOffset(10,y)
+
+	B.BackgroundColor3 = Color3.fromRGB(25,25,30)
+	B.TextColor3 = Color3.new(1,1,1)
+	B.Text = text
+
+	B.Font = Enum.Font.GothamMedium
+	B.TextSize = 12
+
+	B.BorderSizePixel = 0
+	B.AutoButtonColor = false
+	B.Active = true
+	B.ZIndex = 8002
+	B.Parent = Menu
+
+	local C = Instance.new("UICorner")
+	C.CornerRadius = UDim.new(0,8)
+	C.Parent = B
+
+	return B
+end
+
+local VFXButton = MakeButton("VFX : ON",83)
+local NeonButton = MakeButton("NEON : ON",119)
+local MixButton = MakeButton("MIX COLOR : OFF",155)
+local ShaderButton = MakeButton("SHADER : ON",191)
+local ShadowButton = MakeButton("SHADOW : ON",227)
+
+--============================================================
+-- COLOR SCROLLER
+--============================================================
+
+local Scroll = Instance.new("ScrollingFrame")
+Scroll.Name = "COLOR_LIST"
+Scroll.Size = UDim2.new(1,-20,0,155)
+Scroll.Position = UDim2.fromOffset(10,273)
+Scroll.BackgroundColor3 = Color3.fromRGB(15,15,20)
+Scroll.BorderSizePixel = 0
+Scroll.ScrollBarThickness = 6
+Scroll.ScrollBarImageColor3 = Color3.fromRGB(255,0,0)
+Scroll.ScrollingEnabled = true
+Scroll.Active = true
+Scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+Scroll.ZIndex = 8002
+Scroll.Parent = Menu
+
+local ScrollCorner = Instance.new("UICorner")
+ScrollCorner.CornerRadius = UDim.new(0,9)
+ScrollCorner.Parent = Scroll
+
+local Grid = Instance.new("UIGridLayout")
+Grid.CellSize = UDim2.fromOffset(90,54)
+Grid.CellPadding = UDim2.fromOffset(5,5)
+Grid.SortOrder = Enum.SortOrder.LayoutOrder
+Grid.Parent = Scroll
+
+--============================================================
+-- COLORS
+--============================================================
+
+local Colors = {
+	{"Đỏ",255,0,0},
+	{"Đỏ Neon",255,20,20},
+	{"Ruby",200,20,50},
+	{"Đỏ Thẫm",120,0,20},
+
+	{"Cam",255,100,0},
+	{"Cam Lửa",255,60,0},
+	{"Cam Sáng",255,140,0},
+	{"Hổ Phách",255,191,0},
+	{"FFBF00",255,191,0},
+
+	{"Gold",255,200,50},
+	{"Vàng Kim",255,215,0},
+	{"Vàng",255,230,0},
+	{"Vàng Neon",255,255,0},
+
+	{"Lime",150,255,0},
+	{"Xanh Lá",0,255,80},
+	{"Xanh Lá Neon",0,255,0},
+	{"Emerald",40,190,120},
+
+	{"Cyan",0,255,255},
+	{"Cyan Neon",0,255,220},
+	{"Mint",100,255,190},
+	{"Xanh Bạc Hà",50,255,170},
+
+	{"Xanh Biển",0,150,255},
+	{"Xanh Biển Neon",0,200,255},
+	{"Xanh Lam",0,90,255},
+	{"Electric Blue",0,100,255},
+	{"Sapphire",40,80,220},
+
+	{"Tím",140,0,255},
+	{"Tím Neon",180,0,255},
+	{"Violet",110,60,200},
+
+	{"Hồng",255,0,180},
+	{"Hồng Neon",255,20,160},
+	{"Hot Pink",255,0,100},
+	{"Rose",230,80,140},
+	{"Hồng San Hô",255,110,130},
+
+	{"Trắng",255,255,255},
+	{"Trắng Tuyết",245,250,255},
+	{"Bạc",190,190,190},
+	{"Xám",100,100,100},
+	{"Xám Đậm",60,60,60},
+	{"Đen Sáng",35,35,35},
+	{"Đen",20,20,20},
+
+	{"Đỏ Cam",255,70,30},
+	{"Hồng Tím",255,50,180},
+	{"Tím Hồng",200,80,255},
+	{"Tím Xanh",80,30,255},
+	{"Xanh Tím",50,100,255},
+
+	{"Xanh Ngọc",30,255,220},
+	{"Xanh Mint",50,255,170},
+	{"Lime Neon",130,255,30},
+
+	{"Vàng Cam Neon",255,150,30},
+	{"Hồng Tím Neon",255,80,180},
+
+	{"Xanh Đậm",20,50,150},
+	{"Tím Đậm",80,20,150},
+	{"Xanh Rừng",20,100,50},
+	{"Cam San Hô",255,120,90},
+	{"Vàng Chanh",230,255,50},
+
+	{"Trắng Đen",128,128,128}
+}
+
+--============================================================
+-- FILTER
+--============================================================
+
+local IgnoreWords = {
+	"quest",
+	"mission",
+	"chest",
+	"treasure",
+	"reward",
+	"npc",
+	"dialog",
+	"shop",
+	"merchant",
+	"interaction",
+	"questgiver"
+}
+
+local function IsIgnored(obj)
+
+	if not obj then
+		return true
+	end
+
+	local p = obj
+
+	for _ = 1,8 do
+
+		if not p then
+			break
+		end
+
+		local n = string.lower(p.Name)
+
+		for _,word in ipairs(IgnoreWords) do
+
+			if string.find(n,word,1,true) then
+				return true
+			end
+
+		end
+
+		p = p.Parent
+
+	end
+
+	return false
+end
+
+--============================================================
+-- VFX CHECK
+--============================================================
+
+local function IsVFX(obj)
+
+	if not obj or not obj.Parent then
+		return false
+	end
+
+	if obj:IsDescendantOf(Gui) then
+		return false
+	end
+
+	if IsIgnored(obj) then
+		return false
+	end
+
+	return obj:IsA("ParticleEmitter")
+		or obj:IsA("Beam")
+		or obj:IsA("Trail")
+		or obj:IsA("PointLight")
+		or obj:IsA("SpotLight")
+		or obj:IsA("SurfaceLight")
+		or obj:IsA("Highlight")
+end
+
+--============================================================
+-- APPLY
+--============================================================
+
+local function ApplyColor(obj)
+
+	if not Enabled then
+		return
+	end
+
+	if not IsVFX(obj) then
+		return
+	end
+
+	pcall(function()
+
+		if obj:IsA("ParticleEmitter") then
+
+			obj.Color = ColorSequence.new(SelectedColor)
+
+			if Neon then
+				obj.LightEmission =
+					math.max(obj.LightEmission,.35)
+			end
+
+		elseif obj:IsA("Beam") then
+
+			obj.Color = ColorSequence.new(SelectedColor)
+
+		elseif obj:IsA("Trail") then
+
+			obj.Color = ColorSequence.new(SelectedColor)
+
+		elseif obj:IsA("PointLight")
+			or obj:IsA("SpotLight")
+			or obj:IsA("SurfaceLight") then
+
+			obj.Color = SelectedColor
+
+		elseif obj:IsA("Highlight") then
+
+			obj.FillColor = SelectedColor
+			obj.OutlineColor = SelectedColor
+
+		end
+
+	end)
+end
+
+--============================================================
+-- LOW-LAG QUEUE
+--============================================================
+
+local Queue = {}
+local QueueIndex = 1
+local Queued = setmetatable({},{
+	__mode = "k"
+})
+
+local function QueueObject(obj)
+
+	if not IsVFX(obj) then
+		return
+	end
+
+	if Queued[obj] then
+		return
+	end
+
+	Queued[obj] = true
+	Queue[#Queue+1] = obj
+
+end
+
+local function ScanVFX()
+
+	task.spawn(function()
+
+		for _,obj in ipairs(workspace:GetDescendants()) do
+
+			QueueObject(obj)
+
+			if #Queue % 100 == 0 then
+				task.wait()
+			end
+
+		end
+
+	end)
+
+end
+
+workspace.DescendantAdded:Connect(function(obj)
+
+	if obj:IsA("ParticleEmitter")
+		or obj:IsA("Beam")
+		or obj:IsA("Trail")
+		or obj:IsA("PointLight")
+		or obj:IsA("SpotLight")
+		or obj:IsA("SurfaceLight")
+		or obj:IsA("Highlight") then
+
+		task.defer(function()
+			QueueObject(obj)
+		end)
+
+	end
+
+end)
+
+RunService.Heartbeat:Connect(function()
+
+	if not Enabled then
+		return
+	end
+
+	local count = 0
+
+	while QueueIndex <= #Queue
+		and count < MAX_PER_FRAME do
+
+		local obj = Queue[QueueIndex]
+
+		Queue[QueueIndex] = nil
+		QueueIndex += 1
+
+		Queued[obj] = nil
+
+		if obj and obj.Parent then
+			ApplyColor(obj)
+		end
+
+		count += 1
+
+	end
+
+	if QueueIndex > #Queue then
+		Queue = {}
+		QueueIndex = 1
+	end
+
+end)
+
+--============================================================
+-- COLOR BUTTONS
+--============================================================
+
+for i,data in ipairs(Colors) do
+
+	local Name = data[1]
+	local R = data[2]
+	local G = data[3]
+	local B = data[4]
+
+	local Color = Color3.fromRGB(R,G,B)
+
+	local Hex = string.format(
+		"#%02X%02X%02X",
+		R,G,B
+	)
+
+	local Button = Instance.new("TextButton")
+
+	Button.Name = "Color_"..i
+	Button.Size = UDim2.fromOffset(90,54)
+	Button.BackgroundColor3 = Color
+	Button.BorderSizePixel = 0
+	Button.Text = ""
+	Button.AutoButtonColor = false
+	Button.Active = true
+	Button.ZIndex = 8003
+	Button.Parent = Scroll
+
+	local Corner = Instance.new("UICorner")
+	Corner.CornerRadius = UDim.new(0,8)
+	Corner.Parent = Button
+
+	local Stroke = Instance.new("UIStroke")
+	Stroke.Color = Color3.new(1,1,1)
+	Stroke.Transparency = .4
+	Stroke.Parent = Button
+
+	local NameLabel = Instance.new("TextLabel")
+	NameLabel.Size = UDim2.new(1,-4,0,27)
+	NameLabel.Position = UDim2.fromOffset(2,2)
+	NameLabel.BackgroundTransparency = 1
+	NameLabel.Text = Name
+	NameLabel.TextColor3 = Color3.new(1,1,1)
+	NameLabel.TextStrokeTransparency = .2
+	NameLabel.Font = Enum.Font.GothamBold
+	NameLabel.TextSize = 9
+	NameLabel.TextWrapped = true
+	NameLabel.ZIndex = 8004
+	NameLabel.Parent = Button
+
+	local HexLabel = Instance.new("TextLabel")
+	HexLabel.Size = UDim2.new(1,-4,0,17)
+	HexLabel.Position = UDim2.new(0,2,1,-19)
+	HexLabel.BackgroundTransparency = 1
+	HexLabel.Text = Hex
+	HexLabel.TextColor3 = Color3.new(1,1,1)
+	HexLabel.TextStrokeTransparency = .2
+	HexLabel.Font = Enum.Font.Code
+	HexLabel.TextSize = 9
+	HexLabel.ZIndex = 8004
+	HexLabel.Parent = Button
+
+	Button.Activated:Connect(function()
+
+		SelectedColor = Color
+		SelectedName = Name
+
+		Current.BackgroundColor3 = Color
+		Current.Text = Name.." • "..Hex
+
+		ScanVFX()
+
+	end)
+
+end
+
+--============================================================
+-- BUTTONS
+--============================================================
+
+VFXButton.Activated:Connect(function()
+
+	Enabled = not Enabled
+
+	VFXButton.Text =
+		"VFX : "..(Enabled and "ON" or "OFF")
+
+	if Enabled then
+		ScanVFX()
+	end
+
+end)
+
+NeonButton.Activated:Connect(function()
+
+	Neon = not Neon
+
+	NeonButton.Text =
+		"NEON : "..(Neon and "ON" or "OFF")
+
+	ScanVFX()
+
+end)
+
+MixButton.Activated:Connect(function()
+
+	MixColor = not MixColor
+
+	MixButton.Text =
+		"MIX COLOR : "..(MixColor and "ON" or "OFF")
+
+end)
+
+--============================================================
+-- SHADER
+--============================================================
+
+local Bloom = Lighting:FindFirstChild("DQ_Bloom")
+
+if not Bloom then
+
+	Bloom = Instance.new("BloomEffect")
+	Bloom.Name = "DQ_Bloom"
+	Bloom.Parent = Lighting
+
+end
+
+Bloom.Intensity = .12
+Bloom.Size = 18
+Bloom.Threshold = .85
+
+local ColorCorrection =
+	Lighting:FindFirstChild("DQ_Color")
+
+if not ColorCorrection then
+
+	ColorCorrection =
+		Instance.new("ColorCorrectionEffect")
+
+	ColorCorrection.Name = "DQ_Color"
+	ColorCorrection.Parent = Lighting
+
+end
+
+ColorCorrection.Brightness = .01
+ColorCorrection.Contrast = .08
+ColorCorrection.Saturation = .04
+
+ShaderButton.Activated:Connect(function()
+
+	Shader = not Shader
+
+	ShaderButton.Text =
+		"SHADER : "..(Shader and "ON" or "OFF")
+
+	Bloom.Enabled = Shader
+	ColorCorrection.Enabled = Shader
+
+end)
+
+--============================================================
+-- SHADOW
+--============================================================
+
+ShadowButton.Activated:Connect(function()
+
+	Shadow = not Shadow
+
+	ShadowButton.Text =
+		"SHADOW : "..(Shadow and "ON" or "OFF")
+
+	Lighting.GlobalShadows = Shadow
+
+end)
+
+--============================================================
+-- MIX COLOR
+--============================================================
+
+RunService.Heartbeat:Connect(function()
+
+	if not MixColor then
+		return
+	end
+
+	SelectedColor =
+		Color3.fromHSV(
+			(os.clock()*.1)%1,
+			1,
+			1
+		)
+
+	Current.BackgroundColor3 = SelectedColor
+
+end)
+
+--============================================================
+-- MENU POSITION
+--============================================================
+
+local function PositionMenu()
+
+	local pos = Icon.AbsolutePosition
+	local size = Icon.AbsoluteSize
+
+	Menu.Position = UDim2.fromOffset(
+		pos.X + size.X + 10,
+		pos.Y
+	)
+
+end
+
+--============================================================
+-- OPEN / CLOSE
+--============================================================
+
+local MenuOpen = false
+
+Icon.Activated:Connect(function()
+
+	MenuOpen = not MenuOpen
+
+	Menu.Visible = MenuOpen
+
+	if MenuOpen then
+		PositionMenu()
+	end
+
+end)
+
+--============================================================
+-- DRAG
+--============================================================
+
+local Dragging = false
+local DragStart
+local StartPos
+
+Icon.InputBegan:Connect(function(input)
+
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
+
+		Dragging = true
+		DragStart = input.Position
+		StartPos = Icon.Position
+
+	end
+
+end)
+
+UIS.InputChanged:Connect(function(input)
+
+	if not Dragging then
+		return
+	end
+
+	if input.UserInputType ~= Enum.UserInputType.MouseMovement
+		and input.UserInputType ~= Enum.UserInputType.Touch then
+		return
+	end
+
+	local delta = input.Position - DragStart
+
+	Icon.Position = UDim2.new(
+		StartPos.X.Scale,
+		StartPos.X.Offset + delta.X,
+		StartPos.Y.Scale,
+		StartPos.Y.Offset + delta.Y
+	)
+
+	if MenuOpen then
+		PositionMenu()
+	end
+
+end)
+
+UIS.InputEnded:Connect(function(input)
+
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
+
+		Dragging = false
+
+	end
+
+end)
+
+--============================================================
+-- NEON ICON
+--============================================================
+
+local Pulse = 0
+
+RunService.RenderStepped:Connect(function(dt)
+
+	Pulse += dt * 2
+
+	local Glow =
+		(math.sin(Pulse)+1)/2
+
+	IconStroke.Transparency =
+		.05 + Glow*.3
+
+	if MenuOpen then
+
+		MenuStroke.Transparency =
+			.05 + Glow*.25
+
+	end
+
+end)
+
+--============================================================
+-- INITIAL VFX SCAN
+--============================================================
+
+task.defer(function()
+
+	task.wait(.2)
+
+	ScanVFX()
+
+end)
+
+--============================================================
+-- LOADING
+--============================================================
+
+task.spawn(function()
+
+	Loading.Visible = true
+
+	local Dots = 0
+
+	local DotConnection
+
+	DotConnection = task.spawn(function()
+
+		while Loading.Parent do
+
+			Dots += 1
+
+			if Dots > 3 then
+				Dots = 0
+			end
+
+			LoadingText.Text =
+				"LOADING"..string.rep(".",Dots)
+
+			task.wait(.35)
+
+		end
+
+	end)
+
+	-- Không có phần trăm.
+	-- Loading xuất hiện ngay.
+	task.wait(2.5)
+
+	pcall(function()
+
+		LoadingSound:Stop()
+		LoadingSound:Destroy()
+
+	end)
+
+	local Fade = TweenService:Create(
+		Loading,
+		TweenInfo.new(
+			.35,
+			Enum.EasingStyle.Quad,
+			Enum.EasingDirection.Out
+		),
+		{
+			BackgroundTransparency = 1
+		}
+	)
+
+	Fade:Play()
+	Fade.Completed:Wait()
+
+	if Loading and Loading.Parent then
+		Loading:Destroy()
+	end
+
+	Icon.Visible = true
+	Icon.Active = true
+
+end)
+
+print("[DQ] Universal VFX loaded successfully.")
